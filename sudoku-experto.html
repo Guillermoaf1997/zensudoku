@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sudoku Nivel Experto Online | Reto Diabólico Gratis</title>
+<meta name="description" content="Enfréntate al Sudoku nivel experto. Tableros generados algorítmicamente para jugadores avanzados. Usa el modo notas y demuestra tu lógica. Sin anuncios.">
+<meta name="theme-color" content="#eef2f0">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Zen Sudoku Experto",
+  "url": "https://tudominio.github.io/zen-sudoku/sudoku-experto.html",
+  "description": "Juego de Sudoku online en dificultad máxima para jugadores experimentados.",
+  "genre": "Puzzle",
+  "playMode": "SinglePlayer",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Web browser, HTML5"
+}
+</script>
+
+<style>
+  :root {
+    --bg-color: #eef2f0; --primary-color: #9cbcae; --primary-hover: #86a899;
+    --text-color: #5c6b73; --board-bg: #ffffff; --cell-border: #d2e0d9; 
+    --block-border: #7a9c8b; --fixed-text: #8b9a92; --user-text: #3c6350; 
+    --note-text: #a4b3ac; --error-bg: #ffb5a7; --success-color: #7ab396;
+    --selected-cell: #cce0d6; --highlight-cell: #eaf2ee;
+    --soft-shadow: 0 20px 40px rgba(92, 107, 115, 0.08);
+  }
+  body { font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px 10px; user-select: none; }
+  h1 { font-weight: 800; font-size: 2.2rem; margin-bottom: 5px; margin-top: 0; color: var(--primary-color); text-align: center; }
+  .subtitle { font-size: 1rem; color: var(--text-color); margin-bottom: 20px; text-align: center; }
+  .game-container { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: flex-start; max-width: 1000px; margin-bottom: 40px; }
+  .main-panel, .ranking-panel { background: var(--board-bg); padding: 25px; border-radius: 30px; box-shadow: var(--soft-shadow); display: flex; flex-direction: column; align-items: center; }
+  .header-info { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
+  select { padding: 8px 15px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; border-radius: 15px; border: 2px solid var(--cell-border); outline: none; background-color: #f9fbf9; color: var(--text-color); cursor: pointer; }
+  #timer { font-size: 18px; font-weight: 700; color: var(--primary-color); background: #f4f8f6; padding: 6px 15px; border-radius: 15px; }
+  
+  #sudoku-board { display: grid; grid-template-columns: repeat(9, 40px); grid-template-rows: repeat(9, 40px); border: 3px solid var(--block-border); border-radius: 8px; background-color: var(--board-bg); width: 366px; height: 366px; box-sizing: border-box; overflow: hidden;}
+  
+  .cell { width: 40px; height: 40px; box-sizing: border-box; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: 700; cursor: pointer; position: relative; border-right: 1px solid var(--cell-border); border-bottom: 1px solid var(--cell-border); background-color: var(--board-bg); transition: background-color 0.1s; }
+  .cell[data-col="8"] { border-right: none; } .cell[data-row="8"] { border-bottom: none; }
+  .cell[data-col="2"], .cell[data-col="5"] { border-right: 3px solid var(--block-border); }
+  .cell[data-row="2"], .cell[data-row="5"] { border-bottom: 3px solid var(--block-border); }
+  .cell.fixed { color: var(--fixed-text); } .cell.user { color: var(--user-text); }
+  .cell.selected { background-color: var(--selected-cell); } .cell.highlight { background-color: var(--highlight-cell); } .cell.error { background-color: var(--error-bg); color: white; }
+  
+  .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; padding: 2px; box-sizing: border-box; }
+  .note-num { display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: 700; color: var(--note-text); }
+  
+  .numpad { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 25px; width: 100%; max-width: 360px; }
+  .numpad-btn { background-color: #f4f8f6; border: 2px solid var(--cell-border); border-radius: 15px; padding: 12px 0; font-size: 22px; font-weight: 800; color: var(--text-color); cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.1s;}
+  .numpad-btn:active { transform: scale(0.95); }
+  .action-btn { grid-column: span 3; font-size: 16px; background-color: var(--board-bg); display: flex; justify-content: center; align-items: center; gap: 8px;}
+  .notes-active { background-color: var(--text-color); color: white; border-color: var(--text-color); }
+  
+  .controls { margin-top: 20px; display: flex; gap: 10px; width: 100%; }
+  .main-btn { flex: 1; padding: 12px; font-size: 15px; font-family: 'Nunito', sans-serif; cursor: pointer; border: none; border-radius: 15px; background-color: var(--primary-color); color: white; font-weight: 700; transition: all 0.2s;}
+  .main-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+  .share-btn { background-color: #4CAF50; display: none; } 
+  
+  #message { margin-top: 15px; font-weight: 700; font-size: 15px; text-align: center; min-height: 20px; }
+  .ranking-panel { min-width: 250px; } .ranking-panel h3 { margin: 0 0 5px 0; color: var(--primary-color); text-align: center; font-size: 1.3rem;} .ranking-subtitle { font-size: 12px; color: #a4b3ac; margin: 0 0 15px 0; text-align: center;} .ranking-list { list-style: none; padding: 0; margin: 0; width: 100%; } .ranking-list li { display: flex; justify-content: space-between; padding: 10px 5px; border-bottom: 1px dashed var(--cell-border); font-size: 15px;} .ranking-list li:last-child { border-bottom: none; } .rank-pos { font-weight: 700; color: #a4b3ac; } .rank-time { font-weight: 700; color: var(--primary-color); }
+
+  /* Estilos específicos para la navegación y SEO */
+  .nav-links { margin-bottom: 20px; }
+  .nav-links a { color: var(--primary-color); text-decoration: none; font-weight: 700; font-size: 1rem; border: 2px solid var(--cell-border); padding: 5px 15px; border-radius: 20px; transition: all 0.2s; }
+  .nav-links a:hover { background-color: var(--primary-color); color: white; }
+
+  .seo-content { max-width: 800px; background: white; padding: 30px; border-radius: 20px; box-shadow: var(--soft-shadow); line-height: 1.6; }
+  .seo-content h2 { color: var(--primary-color); }
+  .seo-content h3 { color: var(--text-color); font-size: 1.1rem; }
+
+  @media (max-width: 500px) {
+    #sudoku-board { width: 321px; height: 321px; grid-template-columns: repeat(9, 35px); grid-template-rows: repeat(9, 35px); }
+    .cell { width: 35px; height: 35px; font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="nav-links">
+    <a href="index.html">← Volver al Inicio</a>
+  </div>
+
+  <h1>Sudoku Experto</h1>
+  <div class="subtitle">Solo para maestros de la lógica.</div>
+  
+  <div class="game-container">
+    <div class="main-panel">
+      <div class="header-info">
+        <select id="difficulty" onchange="generateGame()">
+          <option value="30">Muy Fácil</option> 
+          <option value="40">Fácil</option>
+          <option value="50">Normal</option> 
+          <option value="60">Difícil</option>
+          <option value="70" selected>Experto</option>
+        </select>
+        <div id="timer">00:00</div>
+      </div>
+
+      <div id="sudoku-board"></div>
+      
+      <div class="numpad">
+        <button class="numpad-btn" onclick="inputNumber(1)">1</button>
+        <button class="numpad-btn" onclick="inputNumber(2)">2</button>
+        <button class="numpad-btn" onclick="inputNumber(3)">3</button>
+        <button class="numpad-btn" onclick="inputNumber(4)">4</button>
+        <button class="numpad-btn" onclick="inputNumber(5)">5</button>
+        <button class="numpad-btn" onclick="inputNumber(6)">6</button>
+        <button class="numpad-btn" onclick="inputNumber(7)">7</button>
+        <button class="numpad-btn" onclick="inputNumber(8)">8</button>
+        <button class="numpad-btn" onclick="inputNumber(9)">9</button>
+        
+        <button class="numpad-btn action-btn" onclick="clearCell()">🗑️ Borrar</button>
+        <button id="notes-btn" class="numpad-btn action-btn" onclick="toggleNotes()">✏️ Notas: OFF</button>
+      </div>
+      
+      <div class="controls">
+        <button class="main-btn" onclick="generateGame()">Nuevo</button>
+        <button class="main-btn" onclick="checkSolution()">Comprobar</button>
+        <button id="share-btn" class="main-btn share-btn" onclick="shareResult()">Compartir</button>
+      </div>
+      <div id="message"></div>
+    </div>
+
+    <div class="ranking-panel">
+      <h3>Mejores Tiempos</h3>
+      <p class="ranking-subtitle">(En la dificultad actual)</p>
+      <ul class="ranking-list" id="ranking-list"></ul>
+    </div>
+  </div>
+
+  <article class="seo-content">
+    <h2>¿Cómo resolver un Sudoku Nivel Experto?</h2>
+    <p>Has llegado al nivel más exigente de Zen Sudoku. Aquí, las técnicas básicas de escaneo visual no son suficientes. Para completar nuestros tableros de nivel experto (que comienzan con muy pocos números iniciales), necesitarás dominar el uso de los candidatos y aplicar deducciones lógicas avanzadas.</p>
+    
+    <h3>1. El uso obligatorio del "Modo Notas"</h3>
+    <p>En el nivel experto, adivinar es sinónimo de perder. Utiliza el botón de <strong>Notas (Lápiz)</strong> para marcar todos los posibles candidatos en cada celda vacía. Nuestro sistema eliminará automáticamente estas notas cuando coloques un número definitivo en la misma fila o bloque, ahorrándote tiempo de limpieza.</p>
+
+    <h3>2. Búsqueda de Pares y Tríos Desnudos (Naked Pairs)</h3>
+    <p>Si dentro de una fila, columna o bloque de 3x3 hay dos celdas que solo pueden contener exactamente los mismos dos números (por ejemplo, el 4 y el 7), sabes con certeza que esos números irán en esas celdas. Esto significa que puedes eliminar el 4 y el 7 como candidatos del resto de celdas de ese grupo.</p>
+
+    <h3>3. La Técnica X-Wing</h3>
+    <p>Esta es una técnica clásica de los maestros del Sudoku. Ocurre cuando un número candidato solo aparece dos veces en dos filas diferentes, y resulta que están exactamente en las mismas columnas. Esto forma un rectángulo o "X". Al identificar esto, puedes eliminar ese número como candidato en el resto de esas dos columnas.</p>
+    
+    <p><em>Pon tu mente a prueba y descubre si tienes lo que hay que tener para entrar en el Top 5 de nuestro ranking local de expertos.</em></p>
+  </article>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('Error SW', err));
+      });
+    }
+
+    const boardElement = document.getElementById('sudoku-board');
+    const messageElement = document.getElementById('message');
+    const timerElement = document.getElementById('timer');
+    const difficultySelect = document.getElementById('difficulty');
+    const notesBtn = document.getElementById('notes-btn');
+    const shareBtn = document.getElementById('share-btn');
+    
+    let solution = [], puzzle = [], userState = [];
+    let selectedCell = null, isNotesMode = false, timerInterval = null, timeElapsed = 0, isTimerRunning = false, gameWon = false;
+
+    function isValid(board, row, col, num) {
+      for (let i = 0; i < 9; i++) {
+        if (board[row][i] === num || board[i][col] === num) return false;
+      }
+      let startRow = Math.floor(row / 3) * 3;
+      let startCol = Math.floor(col / 3) * 3;
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (board[startRow + i][startCol + j] === num) return false;
+        }
+      }
+      return true;
+    }
+
+    function solveSudoku(board) {
+      for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+          if (board[row][col] === 0) {
+            let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
+            for (let num of nums) {
+              if (isValid(board, row, col, num)) {
+                board[row][col] = num;
+                if (solveSudoku(board)) return true;
+                board[row][col] = 0; 
+              }
+            }
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    function formatTime(totalSeconds) {
+        let m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        let s = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function startTimer() {
+      if (isTimerRunning || gameWon) return;
+      isTimerRunning = true;
+      timerInterval = setInterval(() => {
+        timeElapsed++;
+        timerElement.textContent = formatTime(timeElapsed);
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timeElapsed = 0;
+      timerElement.textContent = "00:00";
+    }
+
+    function loadRanking() {
+      const difficultyName = difficultySelect.options[difficultySelect.selectedIndex].text;
+      let records = JSON.parse(localStorage.getItem('zenSudokuRanking')) || {};
+      let times = records[difficultyName] || [];
+      const rankingListElement = document.getElementById('ranking-list');
+      rankingListElement.innerHTML = '';
+      
+      if (times.length === 0) {
+        rankingListElement.innerHTML = '<li style="justify-content:center; color:#a4b3ac;">Sin récords aún</li>';
+        return;
+      }
+      times.forEach((timeInSeconds, index) => {
+        let li = document.createElement('li');
+        li.innerHTML = `<span class="rank-pos">#${index + 1}</span> <span class="rank-time">${formatTime(timeInSeconds)}</span>`;
+        rankingListElement.appendChild(li);
+      });
+    }
+
+    function saveTimeToRanking() {
+      const difficultyName = difficultySelect.options[difficultySelect.selectedIndex].text;
+      let records = JSON.parse(localStorage.getItem('zenSudokuRanking')) || {};
+      if (!records[difficultyName]) records[difficultyName] = [];
+      records[difficultyName].push(timeElapsed);
+      records[difficultyName].sort((a, b) => a - b);
+      records[difficultyName] = records[difficultyName].slice(0, 5); 
+      localStorage.setItem('zenSudokuRanking', JSON.stringify(records));
+      loadRanking();
+    }
+
+    function toggleNotes() {
+      isNotesMode = !isNotesMode;
+      notesBtn.textContent = isNotesMode ? "✏️ Notas: ON" : "✏️ Notas: OFF";
+      if (isNotesMode) notesBtn.classList.add('notes-active');
+      else notesBtn.classList.remove('notes-active');
+    }
+
+    function generateGame() {
+        resetTimer();
+        gameWon = false;
+        selectedCell = null;
+        messageElement.textContent = "";
+        shareBtn.style.display = "none";
+        
+        let board = Array(9).fill().map(() => Array(9).fill(0));
+        solveSudoku(board);
+        solution = board;
+        puzzle = JSON.parse(JSON.stringify(solution));
+        
+        let cellsToRemove = parseInt(difficultySelect.value);
+        let removed = 0;
+        while (removed < cellsToRemove) {
+            let r = Math.floor(Math.random() * 9);
+            let c = Math.floor(Math.random() * 9);
+            if (puzzle[r][c] !== 0) {
+                puzzle[r][c] = 0;
+                removed++;
+            }
+        }
+
+        userState = Array(9).fill().map(() => Array(9).fill(null));
+        for(let r=0; r<9; r++) {
+            for(let c=0; c<9; c++) {
+                let isFixed = puzzle[r][c] !== 0;
+                userState[r][c] = {
+                    val: puzzle[r][c],
+                    notes: new Set(),
+                    fixed: isFixed
+                };
+            }
+        }
+
+        renderBoard();
+        loadRanking(); 
+    }
+
+    function renderBoard() {
+      boardElement.innerHTML = '';
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          let cellDiv = document.createElement('div');
+          cellDiv.className = 'cell';
+          cellDiv.dataset.row = r;
+          cellDiv.dataset.col = c;
+          
+          let state = userState[r][c];
+
+          if (state.fixed) cellDiv.classList.add('fixed');
+          else cellDiv.classList.add('user');
+
+          if (selectedCell && selectedCell.r === r && selectedCell.c === c) {
+            cellDiv.classList.add('selected');
+          } else if (selectedCell) {
+            let sameRow = r === selectedCell.r;
+            let sameCol = c === selectedCell.c;
+            let sameBlock = Math.floor(r/3) === Math.floor(selectedCell.r/3) && Math.floor(c/3) === Math.floor(selectedCell.c/3);
+            if (sameRow || sameCol || sameBlock) cellDiv.classList.add('highlight');
+          }
+
+          if (state.val !== 0) {
+            cellDiv.textContent = state.val;
+          } else if (state.notes.size > 0) {
+            let notesGrid = document.createElement('div');
+            notesGrid.className = 'notes-grid';
+            for (let i = 1; i <= 9; i++) {
+                let noteSpan = document.createElement('div');
+                noteSpan.className = 'note-num';
+                if (state.notes.has(i)) noteSpan.textContent = i;
+                notesGrid.appendChild(noteSpan);
+            }
+            cellDiv.appendChild(notesGrid);
+          }
+
+          cellDiv.addEventListener('mousedown', () => {
+             selectedCell = {r, c};
+             renderBoard(); 
+          });
+
+          boardElement.appendChild(cellDiv);
+        }
+      }
+    }
+
+    function autoClearNotes(r, c, val) {
+        for(let i=0; i<9; i++) {
+            userState[r][i].notes.delete(val);
+            userState[i][c].notes.delete(val);
+        }
+        let startR = Math.floor(r/3)*3;
+        let startC = Math.floor(c/3)*3;
+        for(let i=0; i<3; i++) {
+            for(let j=0; j<3; j++) {
+                userState[startR+i][startC+j].notes.delete(val);
+            }
+        }
+    }
+
+    function inputNumber(num) {
+        if (!selectedCell || gameWon) return;
+        startTimer();
+        let {r, c} = selectedCell;
+        let state = userState[r][c];
+
+        if (state.fixed) return;
+
+        if (isNotesMode) {
+            if (state.val !== 0) return;
+            if (state.notes.has(num)) state.notes.delete(num);
+            else state.notes.add(num);
+        } else {
+            state.val = state.val === num ? 0 : num; 
+            if (state.val !== 0) {
+                state.notes.clear();
+                autoClearNotes(r, c, num);
+            }
+        }
+        renderBoard();
+    }
+
+    function clearCell() {
+        if (!selectedCell || gameWon) return;
+        let {r, c} = selectedCell;
+        let state = userState[r][c];
+        if (state.fixed) return;
+        state.val = 0;
+        state.notes.clear();
+        renderBoard();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key >= '1' && e.key <= '9') {
+            inputNumber(parseInt(e.key));
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
+            clearCell();
+        } else if (e.key.toLowerCase() === 'n') {
+            toggleNotes();
+        }
+    });
+
+    function shareResult() {
+        const difficultyName = difficultySelect.options[difficultySelect.selectedIndex].text;
+        const textToShare = `🧘‍♂️ He resuelto un Zen Sudoku (${difficultyName}) en ${formatTime(timeElapsed)}.\n¡Intenta superar mi récord!\n👉 https://tudominio.github.io/zen-sudoku/sudoku-experto.html`;
+        
+        if (navigator.share) {
+            navigator.share({ title: 'Zen Sudoku', text: textToShare }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(textToShare);
+            alert("¡Resultado copiado al portapapeles! Compártelo con tus amigos.");
+        }
+    }
+
+    function checkSolution() {
+      if(gameWon) return; 
+      let isCorrect = true;
+      let isComplete = true;
+
+      let cells = document.querySelectorAll('.cell');
+      cells.forEach(c => c.classList.remove('error'));
+
+      for(let r=0; r<9; r++) {
+          for(let c=0; c<9; c++) {
+              let val = userState[r][c].val;
+              if (val === 0) {
+                  isComplete = false;
+              } else if (val !== solution[r][c]) {
+                  isCorrect = false;
+                  let idx = r * 9 + c;
+                  cells[idx].classList.add('error');
+              }
+          }
+      }
+
+      if (!isComplete) {
+        messageElement.textContent = "Aún faltan números por rellenar.";
+        messageElement.style.color = "#d49a89"; 
+      } else if (isCorrect) {
+        gameWon = true;
+        clearInterval(timerInterval);
+        saveTimeToRanking();
+        messageElement.textContent = `¡Victoria! Tu tiempo: ${formatTime(timeElapsed)} 🎉`;
+        messageElement.style.color = "var(--success-color)";
+        shareBtn.style.display = "block";
+      } else {
+        messageElement.textContent = "Hay errores. Revisa las casillas en rojo.";
+        messageElement.style.color = "#e57373";
+      }
+    }
+
+    generateGame();
+  </script>
+</body>
+</html>
