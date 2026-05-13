@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- SEO Optimizado: Meta Title y Description -->
+<title>Sudokus para Imprimir en PDF Gratis | Generador (Fácil a Experto)</title>
+<meta name="description" content="Generador infinito de Sudokus para imprimir en PDF gratis. Crea hojas A4 con 2 o 4 sudokus (nivel fácil, medio, difícil y experto). Descarga instantánea sin registro.">
+<meta name="keywords" content="sudokus para imprimir, sudoku pdf gratis, generador de sudokus, sudoku para niños imprimir, sudoku nivel experto pdf, imprimir 4 sudokus por hoja">
+
+<!-- Open Graph para Redes Sociales / WhatsApp -->
+<meta property="og:title" content="Generador de Sudokus PDF Gratis - Zen Sudoku">
+<meta property="og:description" content="Crea y descarga tus propias hojas de Sudoku para jugar en papel. Niveles desde principiante hasta experto.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tudominio.github.io/zen-sudoku/sudokus-para-imprimir.html">
+
+<meta name="theme-color" content="#eef2f0">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  :root {
+    --bg-color: #eef2f0; --primary-color: #9cbcae; --primary-hover: #86a899;
+    --text-color: #5c6b73; --board-bg: #ffffff; --cell-border: #d2e0d9; 
+    --block-border: #7a9c8b; --soft-shadow: 0 20px 40px rgba(92, 107, 115, 0.08);
+  }
+  body { font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px 10px; }
+  h1 { font-weight: 800; font-size: 2.2rem; margin-bottom: 5px; margin-top: 0; color: var(--primary-color); text-align: center; }
+  .subtitle { font-size: 1rem; color: var(--text-color); margin-bottom: 30px; text-align: center; max-width: 600px; }
+  
+  .generator-panel { background: var(--board-bg); padding: 35px; border-radius: 30px; box-shadow: var(--soft-shadow); display: flex; flex-direction: column; align-items: center; max-width: 500px; width: 100%; box-sizing: border-box; margin-bottom: 40px; }
+  
+  .form-group { width: 100%; margin-bottom: 25px; }
+  .form-group label { display: block; font-weight: 700; margin-bottom: 10px; color: var(--text-color); }
+  select { width: 100%; padding: 12px 15px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; border-radius: 15px; border: 2px solid var(--cell-border); outline: none; background-color: #f9fbf9; color: var(--text-color); cursor: pointer; transition: border-color 0.3s; }
+  select:focus { border-color: var(--primary-color); }
+  
+  .main-btn { width: 100%; padding: 15px; font-size: 18px; font-family: 'Nunito', sans-serif; cursor: pointer; border: none; border-radius: 20px; background-color: var(--primary-color); color: white; font-weight: 800; box-shadow: 0 6px 15px rgba(156, 188, 174, 0.4); transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
+  .main-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+  .main-btn:active { transform: translateY(1px); }
+  .main-btn:disabled { background-color: #c5d6ce; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .nav-links { margin-bottom: 20px; width: 100%; max-width: 800px; display: flex; justify-content: flex-start; }
+  .nav-links a { color: var(--primary-color); text-decoration: none; font-weight: 700; font-size: 1rem; border: 2px solid var(--cell-border); padding: 5px 15px; border-radius: 20px; transition: all 0.2s; background: white;}
+  .nav-links a:hover { background-color: var(--primary-color); color: white; }
+
+  /* Estilos para el bloque de contenido SEO */
+  .seo-content { max-width: 800px; background: white; padding: 40px; border-radius: 20px; box-shadow: var(--soft-shadow); line-height: 1.7; margin-bottom: 40px; }
+  .seo-content h2 { color: var(--primary-color); margin-top: 0; font-size: 1.8rem; }
+  .seo-content h3 { color: var(--text-color); font-size: 1.3rem; margin-top: 30px; border-bottom: 2px solid var(--cell-border); padding-bottom: 5px; }
+  .seo-content p { font-size: 1.05rem; }
+  .seo-content ul { padding-left: 20px; }
+  .seo-content li { margin-bottom: 12px; font-size: 1.05rem; }
+
+  .paper-icon { width: 60px; height: 80px; border: 3px solid var(--primary-color); border-radius: 5px; margin-bottom: 20px; position: relative; display: flex; flex-wrap: wrap; align-content: flex-start; padding: 5px; box-sizing: border-box; }
+  .paper-line { width: 100%; height: 2px; background-color: var(--cell-border); margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+  <div class="nav-links">
+    <a href="index.html">← Volver a jugar online</a>
+  </div>
+
+  <h1>Generador de Sudokus PDF</h1>
+  <div class="subtitle">Descarga gratis hojas A4 con sudokus listos para imprimir. Ideal para llevar de viaje, para clase o desconectar de las pantallas.</div>
+  
+  <div class="generator-panel">
+    <div class="paper-icon">
+        <div class="paper-line"></div><div class="paper-line"></div>
+        <div class="paper-line" style="width: 70%"></div>
+        <div style="width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 5px;">
+            <div style="height: 10px; border: 1px solid var(--primary-color)"></div>
+            <div style="height: 10px; border: 1px solid var(--primary-color)"></div>
+            <div style="height: 10px; border: 1px solid var(--primary-color)"></div>
+        </div>
+    </div>
+
+    <div class="form-group">
+      <label for="difficulty">Nivel de dificultad del tablero:</label>
+      <select id="difficulty">
+        <option value="30">Muy Fácil (Sudokus para niños)</option> 
+        <option value="40">Fácil (Principiantes)</option>
+        <option value="50" selected>Normal (Clásico)</option> 
+        <option value="60">Difícil (Avanzados)</option>
+        <option value="70">Experto (Diabólico)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="quantity">Formato de impresión A4:</label>
+      <select id="quantity">
+        <option value="2">2 Sudokus por hoja (Números grandes)</option> 
+        <option value="4" selected>4 Sudokus por hoja (Ahorro de papel)</option>
+      </select>
+    </div>
+
+    <button id="downloadBtn" class="main-btn" onclick="generateAndDownloadPDF()">
+      📄 Generar y Descargar PDF Gratis
+    </button>
+  </div>
+
+  <!-- Contenido semántico altamente optimizado para SEO -->
+  <article class="seo-content">
+    <h2>Sudokus para imprimir gratis en formato PDF</h2>
+    <p>¿Prefieres el tacto del papel y el lápiz al teclado de la pantalla? En Zen Sudoku hemos desarrollado el <strong>mejor generador de sudokus para imprimir</strong> de internet. Olvídate de buscar imágenes pixeladas en Google; nuestra herramienta crea rompecabezas matemáticos únicos e irrepetibles en tiempo real y los exporta en un documento PDF de alta calidad listo para tu impresora.</p>
+
+    <h3>Sudokus para niños y principiantes (Nivel Muy Fácil)</h3>
+    <p>Si eres docente o padre, imprimir sudokus es una herramienta didáctica fantástica. Ayuda a desarrollar el pensamiento lógico, la resolución de problemas y la paciencia en los más pequeños. Selecciona la opción "Muy Fácil" para generar tableros con muchas pistas numéricas, ideales para aprender las reglas básicas sin frustración.</p>
+
+    <h3>El reto definitivo: Sudoku nivel experto para imprimir</h3>
+    <p>Para los veteranos de este puzzle japonés, resolver en papel es un ritual. Al imprimir nuestros <strong>sudokus nivel experto</strong> o diabólicos, tendrás el espacio visual perfecto en los márgenes de la hoja A4 para realizar tus anotaciones, marcas de candidatos y aplicar técnicas avanzadas como <em>X-Wing</em> o <em>Swordfish</em> con total comodidad.</p>
+
+    <h3>¿Por qué utilizar nuestro generador de tableros?</h3>
+    <ul>
+      <li><strong>Descarga instantánea y sin registro:</strong> No pedimos emails ni suscripciones. Haces clic en generar y tu archivo PDF se descarga en segundos.</li>
+      <li><strong>Ahorro de tinta y papel:</strong> Puedes elegir imprimir 4 sudokus por hoja A4, optimizando el espacio al máximo. Si tienes problemas de visión, elige 2 por hoja para obtener cuadrículas gigantes.</li>
+      <li><strong>Vectorial y nítido:</strong> Generamos las líneas y los números mediante código vectorial. El resultado al salir de la impresora es limpio, profesional y con un contraste perfecto para escribir encima.</li>
+    </ul>
+    
+    <p><em>Consejo Zen:</em> Imprime un par de hojas antes de coger un vuelo largo, para llevar a la playa, o simplemente para disfrutar de un domingo por la tarde desconectando de la fatiga digital. Prepara tu lápiz y tu goma de borrar, ¡y a jugar!</p>
+  </article>
+
+  <script>
+    function isValid(board, row, col, num) {
+      for (let i = 0; i < 9; i++) {
+        if (board[row][i] === num || board[i][col] === num) return false;
+      }
+      let startRow = Math.floor(row / 3) * 3;
+      let startCol = Math.floor(col / 3) * 3;
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (board[startRow + i][startCol + j] === num) return false;
+        }
+      }
+      return true;
+    }
+
+    function solveSudoku(board) {
+      for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+          if (board[row][col] === 0) {
+            let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
+            for (let num of nums) {
+              if (isValid(board, row, col, num)) {
+                board[row][col] = num;
+                if (solveSudoku(board)) return true;
+                board[row][col] = 0; 
+              }
+            }
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    function generateSudokuPuzzle(cellsToRemove) {
+      let board = Array(9).fill().map(() => Array(9).fill(0));
+      solveSudoku(board);
+      let puzzle = JSON.parse(JSON.stringify(board));
+      let removed = 0;
+      while (removed < cellsToRemove) {
+          let r = Math.floor(Math.random() * 9);
+          let c = Math.floor(Math.random() * 9);
+          if (puzzle[r][c] !== 0) {
+              puzzle[r][c] = 0;
+              removed++;
+          }
+      }
+      return puzzle;
+    }
+
+    async function generateAndDownloadPDF() {
+      const btn = document.getElementById('downloadBtn');
+      const diffSelect = document.getElementById('difficulty');
+      const cellsToRemove = parseInt(diffSelect.value);
+      const diffText = diffSelect.options[diffSelect.selectedIndex].text.split(' (')[0];
+      const quantity = parseInt(document.getElementById('quantity').value);
+      
+      btn.innerHTML = "⏳ Generando PDF...";
+      btn.disabled = true;
+
+      setTimeout(() => {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF('p', 'mm', 'a4'); 
+          
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(22);
+          doc.setTextColor(156, 188, 174); 
+          doc.text("Zen Sudoku", 105, 20, { align: "center" });
+          
+          doc.setFontSize(12);
+          doc.setTextColor(100, 100, 100);
+          doc.text(`Nivel: ${diffText}`, 105, 28, { align: "center" });
+
+          let cellWidth = quantity === 2 ? 12 : 9; 
+          let boardSize = cellWidth * 9;
+          
+          let positions = [];
+          if (quantity === 2) {
+              positions = [
+                  { x: (210 - boardSize) / 2, y: 45 },
+                  { x: (210 - boardSize) / 2, y: 170 }
+              ];
+          } else {
+              let marginX = (210 - (boardSize * 2 + 15)) / 2; 
+              positions = [
+                  { x: marginX, y: 45 },
+                  { x: marginX + boardSize + 15, y: 45 },
+                  { x: marginX, y: 150 },
+                  { x: marginX + boardSize + 15, y: 150 }
+              ];
+          }
+
+          doc.setDrawColor(0); 
+
+          for (let i = 0; i < quantity; i++) {
+              let puzzle = generateSudokuPuzzle(cellsToRemove);
+              let startX = positions[i].x;
+              let startY = positions[i].y;
+
+              for (let r = 0; r <= 9; r++) {
+                  doc.setLineWidth((r % 3 === 0) ? 0.8 : 0.2);
+                  doc.line(startX, startY + (r * cellWidth), startX + boardSize, startY + (r * cellWidth)); 
+                  doc.line(startX + (r * cellWidth), startY, startX + (r * cellWidth), startY + boardSize); 
+              }
+
+              doc.setFontSize(quantity === 2 ? 20 : 16);
+              doc.setTextColor(0, 0, 0);
+              
+              for (let r = 0; r < 9; r++) {
+                  for (let c = 0; c < 9; c++) {
+                      if (puzzle[r][c] !== 0) {
+                          let textX = startX + (c * cellWidth) + (cellWidth / 2);
+                          let textY = startY + (r * cellWidth) + (cellWidth / 2) + (quantity === 2 ? 2.5 : 2);
+                          doc.text(puzzle[r][c].toString(), textX, textY, { align: "center", baseline: "middle" });
+                      }
+                  }
+              }
+          }
+
+          doc.setFontSize(9);
+          doc.setTextColor(150, 150, 150);
+          doc.text("Generado gratis en: tudominio.github.io/zen-sudoku", 105, 285, { align: "center" });
+
+          doc.save(`ZenSudoku_${diffText.replace(/\s+/g, '')}.pdf`);
+          
+          btn.innerHTML = "📄 Generar y Descargar PDF Gratis";
+          btn.disabled = false;
+      }, 50);
+    }
+  </script>
+</body>
+</html>
