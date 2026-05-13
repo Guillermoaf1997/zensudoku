@@ -141,7 +141,16 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(reg => console.log('SW registrado')).catch(err => console.log('Error SW', err));
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('Error SW', err));
+      });
+
+      // ESTO ES LO NUEVO: Auto-recarga cuando hay actualización
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          window.location.reload();
+          refreshing = true;
+        }
       });
     }
 
