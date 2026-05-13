@@ -16,15 +16,24 @@
     --block-border: #7a9c8b; --fixed-text: #8b9a92; --user-text: #3c6350; 
     --note-text: #a4b3ac; --error-bg: #ffb5a7; --success-color: #7ab396;
     --selected-cell: #cce0d6; --highlight-cell: #eaf2ee;
+    --daily-color: #e6b981; --daily-hover: #d4a56c;
     --soft-shadow: 0 20px 40px rgba(92, 107, 115, 0.08);
   }
   body { font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px 10px; user-select: none; }
-  h1 { font-weight: 800; font-size: 2.2rem; margin-bottom: 5px; margin-top: 0; color: var(--primary-color); }
+  h1 { font-weight: 800; font-size: 2.2rem; margin-bottom: 5px; margin-top: 0; color: var(--primary-color); text-align: center; }
   .subtitle { font-size: 1rem; color: var(--text-color); margin-bottom: 20px; text-align: center; }
+  
+  /* Botón especial del Reto Diario */
+  .daily-challenge-banner { background-color: var(--board-bg); border: 2px solid var(--daily-color); padding: 15px 25px; border-radius: 20px; margin-bottom: 20px; text-align: center; box-shadow: var(--soft-shadow); display: flex; flex-direction: column; align-items: center; gap: 10px;}
+  .daily-challenge-banner span { font-weight: 800; color: var(--daily-color); font-size: 1.2rem;}
+  .btn-daily { background-color: var(--daily-color); color: white; border: none; padding: 10px 20px; border-radius: 15px; font-weight: 800; font-family: 'Nunito', sans-serif; font-size: 1rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(230, 185, 129, 0.3);}
+  .btn-daily:hover { background-color: var(--daily-hover); transform: translateY(-2px); }
+
   .game-container { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: flex-start; max-width: 1000px; margin-bottom: 40px; }
   .main-panel, .ranking-panel { background: var(--board-bg); padding: 25px; border-radius: 30px; box-shadow: var(--soft-shadow); display: flex; flex-direction: column; align-items: center; }
   .header-info { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
   select { padding: 8px 15px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; border-radius: 15px; border: 2px solid var(--cell-border); outline: none; background-color: #f9fbf9; color: var(--text-color); cursor: pointer; }
+  select:disabled { opacity: 0.5; cursor: not-allowed; }
   #timer { font-size: 18px; font-weight: 700; color: var(--primary-color); background: #f4f8f6; padding: 6px 15px; border-radius: 15px; }
   
   #sudoku-board { display: grid; grid-template-columns: repeat(9, 40px); grid-template-rows: repeat(9, 40px); border: 3px solid var(--block-border); border-radius: 8px; background-color: var(--board-bg); width: 366px; height: 366px; box-sizing: border-box; overflow: hidden;}
@@ -68,10 +77,17 @@
   <h1>Zen Sudoku</h1>
   <div class="subtitle">Entrena tu mente, sin distracciones.</div>
   
+  <!-- BANNER RETO DIARIO -->
+  <div class="daily-challenge-banner">
+    <span>🏆 Reto Diario</span>
+    <p style="margin: 0; font-size: 0.9rem; color: var(--text-color);">El mismo tablero para todos. ¡Compite contra el mundo!</p>
+    <button class="btn-daily" onclick="startDailyChallenge()">📅 Jugar Reto de Hoy</button>
+  </div>
+
   <div class="game-container">
     <div class="main-panel">
       <div class="header-info">
-        <select id="difficulty" onchange="generateGame()">
+        <select id="difficulty" onchange="generateGame(false)">
           <option value="30">Muy Fácil</option> <option value="40">Fácil</option>
           <option value="50" selected>Normal</option> <option value="60">Difícil</option>
           <option value="70">Experto</option>
@@ -97,32 +113,26 @@
       </div>
       
       <div class="controls">
-        <button class="main-btn" onclick="generateGame()">Nuevo</button>
+        <button class="main-btn" onclick="generateGame(false)">Nuevo (Aleatorio)</button>
         <button class="main-btn" onclick="checkSolution()">Comprobar</button>
-        <button id="share-btn" class="main-btn share-btn" onclick="shareResult()">Compartir</button>
+        <button id="share-btn" class="main-btn share-btn" onclick="shareResult()">Copiar Resultado</button>
       </div>
       <div id="message"></div>
     </div>
 
     <div class="ranking-panel">
       <h3>Mejores Tiempos</h3>
-      <p class="ranking-subtitle">(En la dificultad actual)</p>
+      <p class="ranking-subtitle" id="ranking-title-desc">(En la dificultad actual)</p>
       <ul class="ranking-list" id="ranking-list"></ul>
     </div>
   </div>
 
   <!-- Navegación a otras secciones (SEO Hub) -->
   <div style="display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 800px;">
-    
-    <a href="sudoku-experto.html" style="background-color: white; border: 2px solid var(--primary-color); color: var(--primary-color); padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 800; font-size: 1.1rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(156, 188, 174, 0.2);">
-      🔥 Jugar Nivel Experto
-    </a>
-    
-    <a href="sudokus-para-imprimir.html" style="background-color: white; border: 2px solid var(--primary-color); color: var(--primary-color); padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 800; font-size: 1.1rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(156, 188, 174, 0.2);">
-      🖨️ Sudokus para Imprimir (PDF)
-    </a>
-
+    <a href="sudoku-experto.html" style="background-color: white; border: 2px solid var(--primary-color); color: var(--primary-color); padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 800; font-size: 1.1rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(156, 188, 174, 0.2);">🔥 Jugar Nivel Experto</a>
+    <a href="sudokus-para-imprimir.html" style="background-color: white; border: 2px solid var(--primary-color); color: var(--primary-color); padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: 800; font-size: 1.1rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(156, 188, 174, 0.2);">🖨️ Sudokus para Imprimir (PDF)</a>
   </div>
+
   <article class="seo-content">
     <h2>¿Cómo jugar a Zen Sudoku Online?</h2>
     <p>Zen Sudoku es una plataforma gratuita diseñada para ofrecer la mejor experiencia de usuario. El objetivo del juego es rellenar una cuadrícula de 9×9 celdas dividida en subcuadrículas de 3×3 con las cifras del 1 al 9 partiendo de algunos números ya dispuestos en algunas de las celdas.</p>
@@ -143,8 +153,6 @@
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(err => console.log('Error SW', err));
       });
-
-      // ESTO ES LO NUEVO: Auto-recarga cuando hay actualización
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing) {
@@ -160,9 +168,38 @@
     const difficultySelect = document.getElementById('difficulty');
     const notesBtn = document.getElementById('notes-btn');
     const shareBtn = document.getElementById('share-btn');
+    const rankingTitleDesc = document.getElementById('ranking-title-desc');
     
     let solution = [], puzzle = [], userState = [];
     let selectedCell = null, isNotesMode = false, timerInterval = null, timeElapsed = 0, isTimerRunning = false, gameWon = false;
+    
+    // --- VARIABLES DEL RETO DIARIO ---
+    let isDailyMode = false;
+    let currentSeed = 1;
+
+    // Generador Pseudoaleatorio con Semilla (Para que el tablero sea igual para todos hoy)
+    function seededRandom() {
+        let t = currentSeed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+
+    function getRandom() {
+        return isDailyMode ? seededRandom() : Math.random();
+    }
+
+    // Formatear fecha actual (Ej: "13/05/2026")
+    function getTodayString() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        let mm = today.getMonth() + 1;
+        let dd = today.getDate();
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+        return dd + '/' + mm + '/' + yyyy;
+    }
+    // ---------------------------------
 
     function isValid(board, row, col, num) {
       for (let i = 0; i < 9; i++) {
@@ -182,7 +219,8 @@
       for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
           if (board[row][col] === 0) {
-            let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
+            // Usamos getRandom() en lugar de Math.random() directo
+            let nums = [1,2,3,4,5,6,7,8,9].sort(() => getRandom() - 0.5);
             for (let num of nums) {
               if (isValid(board, row, col, num)) {
                 board[row][col] = num;
@@ -220,7 +258,9 @@
     }
 
     function loadRanking() {
-      const difficultyName = difficultySelect.options[difficultySelect.selectedIndex].text;
+      const difficultyName = isDailyMode ? `Diario (${getTodayString()})` : difficultySelect.options[difficultySelect.selectedIndex].text;
+      rankingTitleDesc.textContent = isDailyMode ? `(Reto del ${getTodayString()})` : `(En la dificultad actual)`;
+      
       let records = JSON.parse(localStorage.getItem('zenSudokuRanking')) || {};
       let times = records[difficultyName] || [];
       const rankingListElement = document.getElementById('ranking-list');
@@ -238,7 +278,7 @@
     }
 
     function saveTimeToRanking() {
-      const difficultyName = difficultySelect.options[difficultySelect.selectedIndex].text;
+      const difficultyName = isDailyMode ? `Diario (${getTodayString()})` : difficultySelect.options[difficultySelect.selectedIndex].text;
       let records = JSON.parse(localStorage.getItem('zenSudokuRanking')) || {};
       if (!records[difficultyName]) records[difficultyName] = [];
       records[difficultyName].push(timeElapsed);
@@ -255,7 +295,29 @@
       else notesBtn.classList.remove('notes-active');
     }
 
-    function generateGame() {
+    // --- FUNCIÓN DEL RETO DIARIO ---
+    function startDailyChallenge() {
+        isDailyMode = true;
+        const today = new Date();
+        // Creamos una semilla única basada en el día, mes y año (Ej: 20260513)
+        currentSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        
+        difficultySelect.value = "50"; // Dificultad Normal
+        difficultySelect.disabled = true; // Bloqueamos el selector
+        
+        generateGame(true);
+        messageElement.textContent = "¡Reto Diario iniciado! ¡Suerte!";
+        messageElement.style.color = "var(--daily-color)";
+    }
+    // -------------------------------
+
+    function generateGame(isDaily = false) {
+        isDailyMode = isDaily;
+        if (!isDailyMode) {
+            difficultySelect.disabled = false;
+            currentSeed = Math.random() * 1000000; // Semilla aleatoria normal
+        }
+
         resetTimer();
         gameWon = false;
         selectedCell = null;
@@ -270,8 +332,8 @@
         let cellsToRemove = parseInt(difficultySelect.value);
         let removed = 0;
         while (removed < cellsToRemove) {
-            let r = Math.floor(Math.random() * 9);
-            let c = Math.floor(Math.random() * 9);
+            let r = Math.floor(getRandom() * 9);
+            let c = Math.floor(getRandom() * 9);
             if (puzzle[r][c] !== 0) {
                 puzzle[r][c] = 0;
                 removed++;
@@ -397,9 +459,16 @@
         }
     });
 
+    // --- BOTÓN COMPARTIR VIRAL ---
     function shareResult() {
-        const difficultyName = difficultySelect.options[difficultySelect.selectedIndex].text;
-        const textToShare = `🧘‍♂️ He resuelto un Zen Sudoku (${difficultyName}) en ${formatTime(timeElapsed)}.\n¡Intenta superar mi récord!\n👉 https://tudominio.github.io/zen-sudoku/`;
+        let textToShare = "";
+        
+        if (isDailyMode) {
+            textToShare = `🏆 He resuelto el Reto Diario de Zen Sudoku (${getTodayString()}) en ${formatTime(timeElapsed)}.\n¡Intenta superar mi récord!\n👉 https://tudominio.github.io/zen-sudoku/`;
+        } else {
+            const difficultyName = difficultySelect.options[difficultySelect.selectedIndex].text;
+            textToShare = `🧘‍♂️ He resuelto un Zen Sudoku (${difficultyName}) en ${formatTime(timeElapsed)}.\n¡Intenta superarme!\n👉 https://tudominio.github.io/zen-sudoku/`;
+        }
         
         if (navigator.share) {
             navigator.share({ title: 'Zen Sudoku', text: textToShare }).catch(console.error);
@@ -408,6 +477,7 @@
             alert("¡Resultado copiado al portapapeles! Compártelo con tus amigos.");
         }
     }
+    // -----------------------------
 
     function checkSolution() {
       if(gameWon) return; 
@@ -446,8 +516,7 @@
       }
     }
 
-    // Iniciar el juego automáticamente al cargar
-    generateGame();
+    generateGame(false);
   </script>
 </body>
 </html>
